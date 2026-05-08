@@ -67,6 +67,13 @@ body {
   transform: translateX(-30vw) translateY(30vh);
 }
 
+#person.scene-6 {
+  left: 50%;
+  bottom: 3%;
+  width: min(34vw, 420px);
+  transform: translateX(-50%) translateY(10vh);
+}
+
 .start-btn {
   position: absolute;
   left: 50%;
