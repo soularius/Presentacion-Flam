@@ -411,7 +411,7 @@ function setBtn(el, action, text) {
 function swapPerson(cfg) {
   if (!cfg) return;
   const wasVisible = !person.classList.contains('hidden');
-  const srcChanges = cfg.src && cfg.src !== person.src;
+  const srcChanges = cfg.src && !person.src.endsWith(cfg.src);
 
   const apply = () => {
     clearPersonSceneClasses();
