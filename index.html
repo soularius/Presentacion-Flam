@@ -17,7 +17,7 @@
       draggable="false"
     />
 
-    <button id="startBtn" class="start-btn" type="button">Start</button>
+    <button id="startBtn" class="start-btn" type="button">Visit the Town of Flåm</button>
     <button id="backBtn" class="nav-btn hidden" type="button">Back</button>
 
     <div id="priceBoard" class="price-board hidden">
@@ -72,6 +72,25 @@
   <button id="payBtn" class="pay-btn hidden" type="button">Check In</button>
   <button id="getOutBtn" class="getout-btn hidden" type="button">Get Out</button>
   <button id="nextSpotBtn" class="nextspot-btn hidden" type="button">Next Spot</button>
+  <button id="returnHomeBtn" class="returnhome-btn hidden" type="button">Return to Home</button>
+  <button id="restartBtn" class="restart-btn hidden" type="button">Restart Journey</button>
+  <button id="menuBtn" class="menu-btn hidden" type="button">&#128205; Go to Scene</button>
+
+  <div id="sceneMenu" class="scene-menu hidden" role="dialog" aria-modal="true" aria-label="Scene selector">
+    <div class="scene-menu__panel">
+      <h2 class="scene-menu__title">Jump to a Scene</h2>
+      <div class="scene-menu__list">
+        <button class="scene-menu__item" data-target="1">&#127956; Start – Journey to Myrdal</button>
+        <button class="scene-menu__item" data-target="3">&#128640; Arrive at Flåm</button>
+        <button class="scene-menu__item" data-target="5">&#128694; Walk to Accommodation</button>
+        <button class="scene-menu__item" data-target="6">&#127958; Choose: Camp or Hotel</button>
+        <button class="scene-menu__item" data-target="9">&#128166; Brekkefossen Waterfall</button>
+        <button class="scene-menu__item" data-target="11">&#127963; Flamsbana Museum</button>
+        <button class="scene-menu__item" data-target="12">&#127866; Ægir Microbrewery</button>
+      </div>
+      <button id="closeMenuBtn" class="scene-menu__close" type="button" aria-label="Close menu">&#10005;</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
