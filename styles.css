@@ -1,0 +1,114 @@
+:root {
+  --ui-font: "Trebuchet MS", "Segoe UI", sans-serif;
+  --btn-bg: #ffad42;
+  --btn-bg-hover: #ffbe67;
+  --btn-txt: #2e1a00;
+  --btn-shadow: rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  font-family: var(--ui-font);
+  background: #111;
+}
+
+.scene-wrap {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+
+#sceneCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#person {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: min(42vw, 460px);
+  max-width: 90%;
+  user-select: none;
+  pointer-events: none;
+  z-index: 2;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45));
+  transform: translateX(-10vw) translateY(1vh);
+}
+
+#person.hidden {
+  opacity: 0;
+}
+
+.start-btn {
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  transform: translateX(-50%);
+  z-index: 3;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.8rem 2rem;
+  font-size: clamp(1rem, 2.6vw, 1.35rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--btn-txt);
+  background: linear-gradient(180deg, var(--btn-bg-hover), var(--btn-bg));
+  box-shadow: 0 8px 18px var(--btn-shadow);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.start-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.start-btn:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 20px var(--btn-shadow);
+}
+
+.start-btn:active {
+  transform: translateX(-50%) translateY(1px) scale(0.98);
+}
+
+.start-btn.pulse {
+  animation: pulse-ring 0.55s ease;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 173, 66, 0.7), 0 8px 18px var(--btn-shadow);
+  }
+  60% {
+    box-shadow: 0 0 0 20px rgba(255, 173, 66, 0), 0 10px 18px var(--btn-shadow);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 173, 66, 0), 0 8px 18px var(--btn-shadow);
+  }
+}
+
+@media (max-width: 700px) {
+  #person {
+    width: min(60vw, 320px);
+    bottom: 11%;
+  }
+
+  .start-btn {
+    bottom: 3.5%;
+    padding: 0.75rem 1.6rem;
+  }
+}
