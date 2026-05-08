@@ -578,13 +578,13 @@ body {
   z-index: 30;
   border: 2px solid rgba(255, 200, 100, 0.38);
   border-radius: 999px;
-  width: 52px;
-  height: 52px;
+  width: clamp(44px, 7vw, 52px);
+  height: clamp(44px, 7vw, 52px);
   padding: 0;
   padding-left: 3px;
   display: grid;
   place-items: center;
-  font-size: 1.35rem;
+  font-size: clamp(1.1rem, 2.2vw, 1.35rem);
   line-height: 1;
   font-weight: 800;
   letter-spacing: 0;
@@ -706,12 +706,12 @@ body {
   z-index: 30;
   border: 2px solid rgba(255, 255, 255, 0.28);
   border-radius: 999px;
-  width: 52px;
-  height: 52px;
+  width: clamp(44px, 7vw, 52px);
+  height: clamp(44px, 7vw, 52px);
   padding: 0;
   display: grid;
   place-items: center;
-  font-size: 1.35rem;
+  font-size: clamp(1.1rem, 2.2vw, 1.35rem);
   line-height: 1;
   font-weight: 800;
   letter-spacing: 0;
@@ -1143,4 +1143,189 @@ body {
 .scene-menu__close {
   color: #d9f8b4;
   text-shadow: 0 0 8px rgba(167, 255, 110, 0.35);
+}
+
+/* ── Mobile: ≤ 480px ── */
+@media (max-width: 480px) {
+
+  /* Person */
+  #person {
+    width: min(72vw, 260px);
+    bottom: 8%;
+  }
+
+  /* Price boards */
+  .price-board,
+  .price-board--brewery {
+    width: min(78vw, 260px);
+    top: 9%;
+    left: 2%;
+    padding: 0.75rem 0.9rem 1rem;
+  }
+
+  /* Primary action buttons */
+  .start-btn {
+    bottom: 2.5%;
+    padding: 0.65rem 1.4rem;
+    font-size: clamp(0.9rem, 4.5vw, 1.1rem);
+  }
+
+  .nav-btn {
+    left: 3%;
+    top: 3%;
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.82rem, 3.5vw, 0.95rem);
+  }
+
+  /* Action buttons (bottom right) */
+  .pay-btn,
+  .getout-btn,
+  .nextspot-btn,
+  .returnhome-btn {
+    bottom: 2.5%;
+    right: 2%;
+    padding: 0.6rem 1.2rem;
+    font-size: clamp(0.88rem, 3.8vw, 1rem);
+  }
+
+  .getout-btn {
+    right: auto;
+    left: 2%;
+  }
+
+  /* Restart — centrado en la parte inferior */
+  .restart-btn {
+    bottom: 2.5%;
+    padding: 0.7rem 1.6rem;
+    font-size: clamp(0.88rem, 3.8vw, 1rem);
+  }
+
+  /* Menu & icon buttons */
+  .menu-btn {
+    padding: 0.55rem 1rem;
+    font-size: clamp(0.82rem, 3.5vw, 0.95rem);
+  }
+
+  .menu-btn.compact {
+    width: 44px;
+    height: 44px;
+    right: 1%;
+    bottom: 1.5%;
+  }
+
+  .play-video-btn {
+    bottom: 2.5%;
+    left: 2%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+
+  .music-btn {
+    top: 2.5%;
+    right: 2%;
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+  }
+
+  /* Video overlay */
+  .video-overlay__inner {
+    max-width: 94vw;
+    padding: 12px 12px 0;
+  }
+
+  .video-overlay__video {
+    max-width: 90vw;
+    max-height: 50vh;
+  }
+
+  .video-overlay__title {
+    padding: 8px 0 10px;
+  }
+
+  .video-overlay__close {
+    top: -12px;
+    right: -12px;
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Credits overlay */
+  .credits-panel {
+    max-width: min(340px, 92vw);
+    padding: 0 1.2rem 1.1rem;
+  }
+
+  .credits-panel::before {
+    margin: 0 -1.2rem 1.1rem;
+  }
+
+  /* Scene menu */
+  .scene-menu__panel {
+    min-width: min(300px, 92vw);
+    padding: 1.4rem 1.4rem 1.2rem;
+  }
+
+  .scene-menu__item {
+    padding: 0.6rem 1rem;
+    font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+  }
+
+  /* Credits button */
+  .credits-btn {
+    bottom: 0.5%;
+    right: 1%;
+    font-size: clamp(0.5rem, 2.2vw, 0.6rem);
+    padding: 3px 8px;
+  }
+}
+
+/* ── Rotate overlay (portrait mobile) ───────────────────────────────────── */
+.rotate-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0d0b08;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  pointer-events: all;
+}
+
+.rotate-overlay__phone {
+  font-size: 3.5rem;
+  animation: tilt-phone 1.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.rotate-overlay__text {
+  margin: 0;
+  color: #ffe5a0;
+  font-family: var(--ui-font);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.rotate-overlay__sub {
+  margin: 0;
+  color: rgba(255, 220, 120, 0.55);
+  font-family: var(--ui-font);
+  font-size: 0.85rem;
+}
+
+@keyframes tilt-phone {
+  0%   { transform: rotate(0deg); }
+  40%  { transform: rotate(90deg); }
+  60%  { transform: rotate(90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@media screen and (orientation: portrait) and (max-width: 767px) {
+  .rotate-overlay {
+    display: flex;
+  }
 }
