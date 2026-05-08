@@ -113,7 +113,7 @@ const bgScene71 = new Image();
 bgScene71.src = 'assets/img/escene_7_1/background.jpg';
 
 const bgScene72 = new Image();
-bgScene72.src = 'assets/img/escene_7_2/background.jpg';
+bgScene72.src = 'assets/img/escene_7_2/background.png';
 
 const bgScene81 = new Image();
 bgScene81.src = 'assets/img/escene_8_1/background.png';
