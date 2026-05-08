@@ -16,6 +16,10 @@ const musicBtn = document.getElementById('musicBtn');
 const sceneMenu = document.getElementById('sceneMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const menuBoard = document.getElementById('menuBoard');
+const playVideoBtn  = document.getElementById('playVideoBtn');
+const videoOverlay  = document.getElementById('videoOverlay');
+const sceneVideo    = document.getElementById('sceneVideo');
+const closeVideoBtn = document.getElementById('closeVideoBtn');
 
 const bgMusic = new Audio('assets/sounds/music.mp3');
 bgMusic.loop = true;
@@ -485,9 +489,17 @@ function swapPerson(cfg) {
   }
 }
 
+function closeVideo() {
+  videoOverlay.classList.add('hidden');
+  sceneVideo.pause();
+  sceneVideo.currentTime = 0;
+}
+
 function activateScene(id) {
   const cfg = SCENE_CONFIG[id];
   if (!cfg) return;
+
+  closeVideo();
 
   if (SCENE_BG[state.scene]) {
     state.prevBg   = SCENE_BG[state.scene];
@@ -667,12 +679,14 @@ function syncPrimaryButtons() {
   if (state.scene === 0) {
     startBtn.textContent = 'Visit the Town of Flåm';
     startBtn.classList.remove('hidden');
+    playVideoBtn.classList.remove('hidden');
     menuBtn.classList.remove('hidden');
     menuBtn.classList.remove('compact');
     menuBtn.textContent = '\u{1F4CD} Go to Scene';
     return;
   }
 
+  playVideoBtn.classList.add('hidden');
   menuBtn.classList.remove('hidden');
   menuBtn.classList.add('compact');
   menuBtn.textContent = '\u{1F4CD}';
@@ -1364,6 +1378,12 @@ document.querySelectorAll('.scene-menu__item').forEach((btn) => {
 });
 canvas.addEventListener('mousemove', onCanvasMove);
 canvas.addEventListener('click', onCanvasClick);
+playVideoBtn.addEventListener('click', () => {
+  videoOverlay.classList.remove('hidden');
+  sceneVideo.play();
+});
+closeVideoBtn.addEventListener('click', closeVideo);
+videoOverlay.addEventListener('click', (e) => { if (e.target === videoOverlay) closeVideo(); });
 
 bgScene1.addEventListener('load', () => {
   resizeCanvas();

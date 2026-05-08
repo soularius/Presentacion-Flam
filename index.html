@@ -120,7 +120,18 @@
   <button id="returnHomeBtn" class="returnhome-btn hidden" type="button">Return to Home</button>
   <button id="restartBtn" class="restart-btn hidden" type="button">Restart Journey</button>
   <button id="menuBtn" class="menu-btn hidden" type="button">&#128205; Go to Scene</button>
+  <button id="playVideoBtn" class="play-video-btn hidden" type="button" aria-label="Watch video">&#9654;</button>
   <button id="musicBtn" class="music-btn" type="button" aria-label="Muted audio" title="Muted audio">&#128263;</button>
+
+  <div id="videoOverlay" class="video-overlay hidden" role="dialog" aria-modal="true" aria-label="Video">
+    <div class="video-overlay__inner">
+      <div class="video-overlay__bar"></div>
+      <video id="sceneVideo" class="video-overlay__video" src="assets/img/escene_0/video.mp4" playsinline muted></video>
+      <p class="video-overlay__title">Flåm, Norway</p>
+      <button id="closeVideoBtn" class="video-overlay__close" type="button" aria-label="Close video">&#10005;</button>
+    </div>
+    <p class="video-overlay__hint">click anywhere to close</p>
+  </div>
 
   <div id="sceneMenu" class="scene-menu hidden" role="dialog" aria-modal="true" aria-label="Scene selector">
     <div class="scene-menu__panel">
