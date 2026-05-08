@@ -522,6 +522,50 @@ body {
   pointer-events: none;
 }
 
+.music-btn {
+  position: fixed;
+  top: 4%;
+  right: 2.2%;
+  z-index: 30;
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0;
+  color: #eef7ff;
+  background: linear-gradient(160deg, #223850, #1a2a3a);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.music-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 20px rgba(0, 0, 0, 0.4);
+}
+
+.music-btn:active {
+  transform: translateY(1px);
+}
+
+.music-btn.is-muted {
+  background: linear-gradient(160deg, #4f2b2b, #2f1717);
+  border-color: rgba(255, 178, 178, 0.42);
+  color: #ffdada;
+}
+
+.music-btn.is-unmuted {
+  background: linear-gradient(160deg, #2a5c34, #17321e);
+  border-color: rgba(181, 255, 174, 0.42);
+  color: #deffd6;
+}
+
 /* ── Scene 0 person ── */
 #person.scene-0 {
   left: 50%;
@@ -660,4 +704,127 @@ body {
   0%   { transform: translateY(0)    rotate(0deg)   scale(1); opacity: 1; }
   80%  { opacity: 1; }
   100% { transform: translateY(110vh) rotate(720deg) scale(0.7); opacity: 0; }
+}
+
+/* ── Arcade Button Skin ── */
+.start-btn,
+.nav-btn,
+.pay-btn,
+.getout-btn,
+.nextspot-btn,
+.returnhome-btn,
+.restart-btn,
+.menu-btn,
+.music-btn,
+.scene-menu__item {
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35), 0 0 10px rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.45);
+  background-blend-mode: overlay, normal;
+  backdrop-filter: blur(1px);
+}
+
+.start-btn,
+.restart-btn,
+.pay-btn {
+  border-color: rgba(255, 222, 140, 0.42);
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0px,
+      rgba(255, 255, 255, 0.12) 2px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0) 5px
+    ),
+    linear-gradient(160deg, #ffd176, #f3a22b);
+}
+
+.nav-btn,
+.menu-btn,
+.music-btn,
+.getout-btn {
+  border-color: rgba(130, 205, 255, 0.35);
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 2px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0) 5px
+    ),
+    linear-gradient(160deg, #355d84, #1d3248);
+}
+
+.nextspot-btn {
+  border-color: rgba(187, 255, 156, 0.38);
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.09) 0px,
+      rgba(255, 255, 255, 0.09) 2px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0) 5px
+    ),
+    linear-gradient(160deg, #5b8930, #2d4918);
+}
+
+.returnhome-btn {
+  border-color: rgba(255, 178, 178, 0.36);
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.09) 0px,
+      rgba(255, 255, 255, 0.09) 2px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0) 5px
+    ),
+    linear-gradient(160deg, #8a4230, #4a1f12);
+}
+
+.start-btn:hover,
+.nav-btn:hover,
+.pay-btn:hover,
+.getout-btn:hover,
+.nextspot-btn:hover,
+.returnhome-btn:hover,
+.restart-btn:hover,
+.menu-btn:hover,
+.music-btn:hover,
+.scene-menu__item:hover {
+  filter: brightness(1.08) saturate(1.12);
+}
+
+.start-btn:active,
+.nav-btn:active,
+.pay-btn:active,
+.getout-btn:active,
+.nextspot-btn:active,
+.returnhome-btn:active,
+.restart-btn:active,
+.menu-btn:active,
+.music-btn:active,
+.scene-menu__item:active {
+  filter: brightness(0.95) saturate(0.95);
+}
+
+.menu-btn.compact {
+  border-color: rgba(140, 219, 255, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.34),
+    0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+.scene-menu__item {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-color: rgba(157, 233, 117, 0.28);
+}
+
+.scene-menu__close {
+  color: #d9f8b4;
+  text-shadow: 0 0 8px rgba(167, 255, 110, 0.35);
 }

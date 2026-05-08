@@ -12,8 +12,43 @@ const nextSpotBtn = document.getElementById('nextSpotBtn');
 const returnHomeBtn = document.getElementById('returnHomeBtn');
 const restartBtn = document.getElementById('restartBtn');
 const menuBtn = document.getElementById('menuBtn');
+const musicBtn = document.getElementById('musicBtn');
 const sceneMenu = document.getElementById('sceneMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
+
+const bgMusic = new Audio('assets/sounds/music.mp3');
+bgMusic.loop = true;
+bgMusic.volume = 0.42;
+bgMusic.muted = true;
+
+let musicStarted = false;
+
+function updateMusicButtonLabel() {
+  const isMuted = bgMusic.muted || !musicStarted;
+  musicBtn.textContent = isMuted ? '🔇' : '🔊';
+  musicBtn.setAttribute('aria-label', isMuted ? 'Muted audio' : 'Audio on');
+  musicBtn.title = isMuted ? 'Muted audio' : 'Audio on';
+  musicBtn.classList.toggle('is-muted', isMuted);
+  musicBtn.classList.toggle('is-unmuted', !isMuted);
+}
+
+function onMusicToggleClick() {
+  if (!musicStarted) {
+    musicStarted = true;
+    bgMusic.play().catch(() => {
+      musicStarted = false;
+      updateMusicButtonLabel();
+    });
+  }
+
+  bgMusic.muted = !bgMusic.muted;
+  if (bgMusic.paused) {
+    bgMusic.play().catch(() => {
+      // Ignore transient playback errors caused by browser policies.
+    });
+  }
+  updateMusicButtonLabel();
+}
 
 function spawnCoins() {
   const count = 28;
@@ -782,7 +817,7 @@ function render() {
 
     if (state.scene1Visible) {
       drawTrajectory(path);
-      drawLabel('Start', path.p0.x - 34, path.p0.y - 12);
+      drawLabel('Oslo', path.p0.x - 34, path.p0.y - 12);
       drawLabel('Myrdal mountain', path.p3.x - 120, path.p3.y - 12);
 
       const point = getPathPoint(state.scene1Progress, path);
@@ -1157,6 +1192,7 @@ nextSpotBtn.addEventListener('click', onNextSpotClick);
 returnHomeBtn.addEventListener('click', () => activateScene0());
 restartBtn.addEventListener('click', restartJourney);
 menuBtn.addEventListener('click', () => sceneMenu.classList.remove('hidden'));
+musicBtn.addEventListener('click', onMusicToggleClick);
 closeMenuBtn.addEventListener('click', () => sceneMenu.classList.add('hidden'));
 sceneMenu.addEventListener('click', (e) => {
   if (e.target === sceneMenu) sceneMenu.classList.add('hidden');
@@ -1173,6 +1209,7 @@ bgScene1.addEventListener('load', () => {
 
 function init() {
   resizeCanvas();
+  updateMusicButtonLabel();
   activateScene0();
   render();
 }
