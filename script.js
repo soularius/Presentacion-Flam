@@ -15,6 +15,7 @@ const menuBtn = document.getElementById('menuBtn');
 const musicBtn = document.getElementById('musicBtn');
 const sceneMenu = document.getElementById('sceneMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
+const menuBoard = document.getElementById('menuBoard');
 
 const bgMusic = new Audio('assets/sounds/music.mp3');
 bgMusic.loop = true;
@@ -279,7 +280,7 @@ const SCENE_PATHS = {
         camp:  { p: [[0.26,0.76],[0.20,0.54],[0.44,0.38],[0.52,0.34]] },
         hotel: { p: [[0.74,0.76],[0.80,0.54],[0.60,0.38],[0.52,0.34]] } },
   11: { type: 'bezier',  p: [[0.28,0.65],[0.22,0.52],[0.56,0.44],[0.70,0.56]] },
-  12: { type: 'bezier',  p: [[0.26,0.42],[0.36,0.18],[0.64,0.18],[0.74,0.36]] },
+  12: { type: 'bezier',  p: [[0.40,0.44],[0.52,0.20],[0.74,0.20],[0.86,0.38]] },
 };
 
 function resolvePath(id) {
@@ -304,7 +305,7 @@ const SCENE_CONFIG = {
   0: {
     running: false, show: ['scene0'], hide: ['scene1', 'scene12'],
     person: { src: personScene0, cls: 'scene-0' },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 'h', returnHomeBtn: 'h', restartBtn: 'h' },
     afterActivate: () => syncPrimaryButtons(),
   },
@@ -312,90 +313,93 @@ const SCENE_CONFIG = {
     running: false, show: ['scene1'], hide: ['scene0'],
     resetProgress: ['scene1Progress'],
     person: { src: personScene1, cls: 'scene-1' },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 'h', returnHomeBtn: 'h', restartBtn: 'h' },
   },
   2: {
     running: true, show: ['scene2'], hide: ['scene1', 'scene81', 'scene82', 'scene9'],
     resetProgress: ['scene2Progress'],
     person: { hidden: true },
-    buttons: { backBtn: 'h', getOutBtn: 'h', nextSpotBtn: 'h' },
+    buttons: { menuBoard: 'h', backBtn: 'h', getOutBtn: 'h', nextSpotBtn: 'h' },
   },
   3: {
     running: false, show: ['scene3'], hide: ['scene2'],
+    buttons: { menuBoard: 'h' },
   },
   4: {
     running: true, show: ['scene4'], hide: ['scene3', 'scene5'],
     resetProgress: ['scene4Progress'],
     person: { src: personScene4, cls: 'scene-4' },
+    buttons: { menuBoard: 'h' },
   },
   5: {
     running: false, show: ['scene5'], hide: ['scene4', 'scene6'],
     resetProgress: ['scene5Progress', 'scene5HoldTick'],
     person: { src: personScene5, cls: 'scene-5' },
+    buttons: { menuBoard: 'h' },
   },
   6: {
     running: false, show: ['scene6'], hide: ['scene5', 'scene71', 'scene72', 'scene81', 'scene82', 'scene9'],
     resetProgress: ['scene6Progress'], resetNull: ['scene6Choice'],
     person: { src: personScene6, cls: 'scene-6' },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 'h' },
   },
   71: {
     running: false, show: ['scene71'], hide: ['scene6', 'scene72', 'scene81', 'scene82', 'scene9'],
     person: { src: personScene71, cls: 'scene-7-1' },
-    buttons: { priceBoard: 's', priceBoardHotel: 'h', payBtn: 's', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 's', priceBoardHotel: 'h', payBtn: 's', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 's', backBtnText: 'Back' },
   },
   72: {
     running: false, show: ['scene72'], hide: ['scene6', 'scene71', 'scene81', 'scene82', 'scene9'],
     person: { src: personScene72, cls: 'scene-7-2' },
-    buttons: { priceBoard: 'h', priceBoardHotel: 's', payBtn: 's', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 's', payBtn: 's', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 's', backBtnText: 'Exit' },
   },
   81: {
     running: false, show: ['scene81'], hide: ['scene71', 'scene82', 'scene72', 'scene9'],
     person: { src: personScene81, hidden: true },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 's',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 's',
                nextSpotBtn: 'h', backBtn: 's', backBtnText: 'Back' },
   },
   82: {
     running: false, show: ['scene82'], hide: ['scene72', 'scene81', 'scene71', 'scene9'],
     person: { src: personScene82, hidden: true },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 's',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 's',
                nextSpotBtn: 'h', backBtn: 's', backBtnText: 'Back' },
   },
   9: {
     running: false, show: ['scene9'], hide: ['scene71', 'scene72', 'scene81', 'scene82', 'scene10'],
     resetProgress: ['scene9Progress'],
     person: { hidden: true },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 's', backBtn: 'h' },
   },
   10: {
     running: true, show: ['scene10'], hide: ['scene71', 'scene72', 'scene81', 'scene82', 'scene9'],
     resetProgress: ['scene10Progress'],
     person: { hidden: true },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 'h' },
   },
   11: {
     running: false, show: ['scene11'], hide: ['scene10'],
     resetProgress: ['scene11Progress'], resetPulseTick: true,
     person: { hidden: true },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
+    buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 's', backBtn: 'h' },
   },
   12: {
     running: false, show: ['scene12'], hide: ['scene11'],
     resetProgress: ['scene12Progress'], resetPulseTick: true,
     person: { hidden: true },
-    buttons: { priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
+    buttons: { menuBoard: 's', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 'h', returnHomeBtn: 's', restartBtn: 'h' },
   },
 };
 
-const BTN_MAP = { priceBoard, priceBoardHotel, payBtn, getOutBtn,
+const BTN_MAP = { menuBoard, priceBoard, priceBoardHotel, payBtn, getOutBtn,
                   nextSpotBtn, backBtn, returnHomeBtn, restartBtn };
 
 function setBtn(el, action, text) {
