@@ -9,6 +9,14 @@ bgScene1.src = 'assets/img/escene_1/background.png';
 const bgScene2 = new Image();
 bgScene2.src = 'assets/img/escene_2/background.png';
 
+const bgScene3 = new Image();
+bgScene3.src = 'assets/img/escene_3/background.jpg';
+
+const bgScene4 = new Image();
+bgScene4.src = 'assets/img/escene_4/background.jpg';
+
+const personScene4 = 'assets/img/escene_4/person.png';
+
 const train = new Image();
 train.src = 'assets/img/escene_2/tren.png';
 
@@ -16,12 +24,18 @@ const state = {
   w: 0,
   h: 0,
   scene: 1,
-  progress: 0,
+  scene1Progress: 0,
+  scene2Progress: 0,
+  scene4Progress: 0,
+  pulseTick: 0,
   running: false,
-  pathVisible: false,
-  trainX: -240,
-  trainSpeed: 4,
+  scene1Visible: true,
+  scene2Visible: false,
+  scene3Visible: false,
+  scene4Visible: false,
   trainScale: 1,
+  hoverX: -9999,
+  hoverY: -9999,
 };
 
 function resizeCanvas() {
@@ -76,46 +90,83 @@ function bezierPoint(t, p0, p1, p2, p3) {
   );
 }
 
-function getPathPoint(t) {
-  const p0 = { x: state.w * 0.14, y: state.h * 0.74 };
-  const p1 = { x: state.w * 0.28, y: state.h * 0.23 };
-  const p2 = { x: state.w * 0.64, y: state.h * 0.86 };
-  const p3 = { x: state.w * 0.84, y: state.h * 0.36 };
-
+function getScene1Path() {
   return {
-    x: bezierPoint(t, p0.x, p1.x, p2.x, p3.x),
-    y: bezierPoint(t, p0.y, p1.y, p2.y, p3.y),
+    p0: { x: state.w * 0.14, y: state.h * 0.74 },
+    p1: { x: state.w * 0.28, y: state.h * 0.23 },
+    p2: { x: state.w * 0.64, y: state.h * 0.86 },
+    p3: { x: state.w * 0.84, y: state.h * 0.36 },
   };
 }
 
-function drawTrajectory() {
-  const p0 = { x: state.w * 0.14, y: state.h * 0.74 };
-  const p1 = { x: state.w * 0.28, y: state.h * 0.23 };
-  const p2 = { x: state.w * 0.64, y: state.h * 0.86 };
-  const p3 = { x: state.w * 0.84, y: state.h * 0.36 };
+function getScene2Path() {
+  return {
+    p0: { x: state.w * -0.12, y: state.h * 0.79 },
+    p1: { x: state.w * 0.26, y: state.h * 0.74 },
+    p2: { x: state.w * 0.64, y: state.h * 0.8 },
+    p3: { x: state.w * 1.05, y: state.h * 0.76 },
+  };
+}
 
+function getScene3Path() {
+  return {
+    p0: { x: state.w * 0.2, y: state.h * 0.77 },
+    p1: { x: state.w * 0.42, y: state.h * 0.58 },
+    p2: { x: state.w * 0.58, y: state.h * 0.66 },
+    p3: { x: state.w * 0.82, y: state.h * 0.45 },
+  };
+}
+
+function getScene4Path() {
+  return {
+    p0: { x: state.w * 0.18, y: state.h * 0.72 },
+    p1: { x: state.w * 0.4, y: state.h * 0.5 },
+    p2: { x: state.w * 0.63, y: state.h * 0.68 },
+    p3: { x: state.w * 0.84, y: state.h * 0.42 },
+  };
+}
+
+function getPathPoint(t, path) {
+  return {
+    x: bezierPoint(t, path.p0.x, path.p1.x, path.p2.x, path.p3.x),
+    y: bezierPoint(t, path.p0.y, path.p1.y, path.p2.y, path.p3.y),
+  };
+}
+
+function drawTrajectory(path) {
   ctx.save();
   ctx.lineWidth = 4;
   ctx.setLineDash([10, 8]);
   ctx.strokeStyle = 'rgba(255, 235, 170, 0.88)';
   ctx.beginPath();
-  ctx.moveTo(p0.x, p0.y);
-  ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+  ctx.moveTo(path.p0.x, path.p0.y);
+  ctx.bezierCurveTo(path.p1.x, path.p1.y, path.p2.x, path.p2.y, path.p3.x, path.p3.y);
   ctx.stroke();
   ctx.restore();
 }
 
-function drawMover() {
-  const p = getPathPoint(state.progress);
+function drawLabel(text, x, y) {
+  ctx.save();
+  ctx.font = '700 26px Trebuchet MS';
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+  ctx.fillStyle = '#fff4d6';
+  ctx.strokeText(text, x, y);
+  ctx.fillText(text, x, y);
+  ctx.restore();
+}
 
-  const glow = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, 20);
+function drawMover(point, radius = 20) {
+  const p = point;
+
+  const glow = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, radius);
   glow.addColorStop(0, 'rgba(255, 255, 220, 1)');
   glow.addColorStop(0.5, 'rgba(255, 208, 101, 0.85)');
   glow.addColorStop(1, 'rgba(255, 208, 101, 0)');
 
   ctx.fillStyle = glow;
   ctx.beginPath();
-  ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
+  ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.fillStyle = '#fff8d3';
@@ -124,56 +175,142 @@ function drawMover() {
   ctx.fill();
 }
 
-function drawTrain() {
+function drawTrainOnPoint(point) {
   if (!train.complete) {
     return;
   }
 
   const trainW = train.width * state.trainScale;
   const trainH = train.height * state.trainScale;
-  const railY = state.h * 0.78;
-  const trainY = railY - trainH;
+  const trainX = point.x - trainW * 0.5;
+  const trainY = point.y - trainH * 0.92;
 
-  ctx.drawImage(train, state.trainX, trainY, trainW, trainH);
-
-  state.trainX += state.trainSpeed;
-  if (state.trainX > state.w + trainW) {
-    state.trainX = -trainW;
-  }
+  ctx.drawImage(train, trainX, trainY, trainW, trainH);
 }
 
 function activateScene2() {
   state.scene = 2;
-  state.running = false;
-  state.pathVisible = false;
+  state.running = true;
+  state.scene1Visible = false;
+  state.scene2Visible = true;
+  state.scene2Progress = 0;
 
+  person.classList.remove('scene-4');
   person.classList.add('hidden');
   startBtn.classList.add('hidden');
+}
 
-  const trainW = (train.width || 320) * state.trainScale;
-  state.trainX = -trainW;
+function activateScene3() {
+  state.scene = 3;
+  state.running = false;
+  state.scene2Visible = false;
+  state.scene3Visible = true;
+}
+
+function activateScene4() {
+  state.scene = 4;
+  state.running = true;
+  state.scene3Visible = false;
+  state.scene4Visible = true;
+  state.scene4Progress = 0;
+
+  person.src = personScene4;
+  person.classList.remove('hidden');
+  person.classList.add('scene-4');
+}
+
+function isPointHit(point, radius, mouseX, mouseY) {
+  const dx = mouseX - point.x;
+  const dy = mouseY - point.y;
+  return dx * dx + dy * dy <= radius * radius;
+}
+
+function getScene3ClickPoint() {
+  const path = getScene3Path();
+  return getPathPoint(0, path);
+}
+
+function updateCursor() {
+  if (state.scene !== 3) {
+    canvas.style.cursor = 'default';
+    return;
+  }
+
+  const p = getScene3ClickPoint();
+  const pulseRadius = 18 + Math.sin(state.pulseTick) * 3.8;
+  const hit = isPointHit(p, pulseRadius + 10, state.hoverX, state.hoverY);
+  canvas.style.cursor = hit ? 'pointer' : 'default';
 }
 
 function render() {
   if (state.scene === 1) {
     drawCoverImage(bgScene1);
+    const path = getScene1Path();
 
-    if (state.pathVisible) {
-      drawTrajectory();
-      drawMover();
+    if (state.scene1Visible) {
+      drawTrajectory(path);
+      drawLabel('Start', path.p0.x - 34, path.p0.y - 12);
+      drawLabel('Myrdal mountain', path.p3.x - 120, path.p3.y - 12);
+
+      const point = getPathPoint(state.scene1Progress, path);
+      drawMover(point, 20);
     }
 
     if (state.running) {
-      state.progress += 0.005;
+      state.scene1Progress += 0.005;
 
-      if (state.progress >= 1) {
-        state.progress = 1;
+      if (state.scene1Progress >= 1) {
+        state.scene1Progress = 1;
         activateScene2();
       }
     }
-  } else {
+  } else if (state.scene === 2) {
     drawCoverImage(bgScene2);
-    drawTrain();
+    const path = getScene2Path();
+    drawTrajectory(path);
+
+    const trainPoint = getPathPoint(state.scene2Progress, path);
+    drawTrainOnPoint(trainPoint);
+    drawMover(trainPoint, 14);
+
+    if (state.running) {
+      state.scene2Progress += 0.0032;
+      if (state.scene2Progress >= 1) {
+        state.scene2Progress = 1;
+        activateScene3();
+      }
+    }
+  } else if (state.scene === 3) {
+    drawCoverImage(bgScene3);
+    const path = getScene3Path();
+    drawTrajectory(path);
+    drawLabel('Myrdal mountain', path.p0.x - 130, path.p0.y - 14);
+    drawLabel('Flåm', path.p3.x - 85, path.p3.y - 14);
+
+    state.pulseTick += 0.08;
+    const pulseRadius = 18 + Math.sin(state.pulseTick) * 3.8;
+    const clickPoint = getPathPoint(0, path);
+    drawMover(clickPoint, pulseRadius);
+    updateCursor();
+  } else {
+    drawCoverImage(bgScene4);
+    const path = getScene4Path();
+    drawTrajectory(path);
+    drawLabel('Myrdal mountain', path.p0.x - 130, path.p0.y - 14);
+    drawLabel('Flåm', path.p3.x - 85, path.p3.y - 14);
+
+    const movingPoint = getPathPoint(state.scene4Progress, path);
+    drawMover(movingPoint, 18);
+
+    if (state.running) {
+      state.scene4Progress += 0.0034;
+      if (state.scene4Progress >= 1) {
+        state.scene4Progress = 1;
+        state.running = false;
+      }
+    }
+
+    updateCursor();
   }
 
   requestAnimationFrame(render);
@@ -184,13 +321,38 @@ function startAnimation() {
   void startBtn.offsetWidth;
   startBtn.classList.add('pulse');
 
-  state.progress = 0;
-  state.pathVisible = true;
+  state.scene1Progress = 0;
+  state.scene1Visible = true;
   state.running = true;
+}
+
+function onCanvasMove(event) {
+  const rect = canvas.getBoundingClientRect();
+  state.hoverX = event.clientX - rect.left;
+  state.hoverY = event.clientY - rect.top;
+}
+
+function onCanvasClick(event) {
+  if (state.scene !== 3) {
+    return;
+  }
+
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  const clickPoint = getScene3ClickPoint();
+  const pulseRadius = 18 + Math.sin(state.pulseTick) * 3.8;
+
+  if (isPointHit(clickPoint, pulseRadius + 10, x, y)) {
+    activateScene4();
+  }
 }
 
 window.addEventListener('resize', resizeCanvas);
 startBtn.addEventListener('click', startAnimation);
+canvas.addEventListener('mousemove', onCanvasMove);
+canvas.addEventListener('click', onCanvasClick);
+
 bgScene1.addEventListener('load', () => {
   resizeCanvas();
 });

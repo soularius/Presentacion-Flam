@@ -45,11 +45,19 @@ body {
   pointer-events: none;
   z-index: 2;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45));
-  transform: translateX(-10vw) translateY(1vh);
+  transform: translateX(-20vw) translateY(10vh);
+  transition: opacity 0.5s ease;
 }
 
 #person.hidden {
   opacity: 0;
+}
+
+#person.scene-4 {
+  right: 2%;
+  bottom: 2%;
+  width: min(43vw, 510px);
+  transform: translateX(-25vw) translateY(10vh);
 }
 
 .start-btn {
@@ -68,7 +76,7 @@ body {
   background: linear-gradient(180deg, var(--btn-bg-hover), var(--btn-bg));
   box-shadow: 0 8px 18px var(--btn-shadow);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, opacity 0.35s ease;
 }
 
 .start-btn.hidden {
