@@ -191,6 +191,10 @@ const state = {
   scene11Progress: 0,
   scene12Progress: 0,
   pulseTick: 0,
+  dashOffset: 0,
+  prevBg: null,
+  fadeAlpha: 1,
+  labelAlpha: 0,
 
   // --- Visibility flags ---
   scene0Visible: true,
@@ -228,9 +232,7 @@ function resizeCanvas() {
   state.trainScale = Math.max(0.4, Math.min(1.25, state.w / 1200));
 }
 
-function drawCoverImage(img, alignBottom = false) {
-  ctx.clearRect(0, 0, state.w, state.h);
-
+function drawBgImage(img, alignBottom = false) {
   if (!img.complete || img.naturalWidth === 0) {
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(0, 0, state.w, state.h);
@@ -256,6 +258,21 @@ function drawCoverImage(img, alignBottom = false) {
   }
 
   ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+}
+
+function drawCoverImage(img, alignBottom = false) {
+  ctx.clearRect(0, 0, state.w, state.h);
+  if (state.prevBg && state.fadeAlpha < 1) {
+    drawBgImage(state.prevBg);
+    ctx.save();
+    ctx.globalAlpha = state.fadeAlpha;
+    drawBgImage(img, alignBottom);
+    ctx.restore();
+    state.fadeAlpha = Math.min(1, state.fadeAlpha + 0.045);
+    if (state.fadeAlpha >= 1) state.prevBg = null;
+    return;
+  }
+  drawBgImage(img, alignBottom);
 }
 
 function bezierPoint(t, p0, p1, p2, p3) {
@@ -300,6 +317,13 @@ function resolvePath(id) {
   const [p0, p1, p2, p3] = d[origin].p;
   return { p0: s(...p0), p1: s(...p1), p2: s(...p2), p3: s(...p3) };
 }
+
+const SCENE_BG = {
+  0: bgScene0, 1: bgScene1, 2: bgScene2,  3: bgScene3,
+  4: bgScene4, 5: bgScene5, 6: bgScene6,
+  71: bgScene71, 72: bgScene72, 81: bgScene81, 82: bgScene82,
+  9: bgScene9, 10: bgScene10, 11: bgScene11, 12: bgScene12,
+};
 
 const SCENE_CONFIG = {
   0: {
@@ -436,6 +460,10 @@ function activateScene(id) {
   const cfg = SCENE_CONFIG[id];
   if (!cfg) return;
 
+  if (SCENE_BG[state.scene]) {
+    state.prevBg   = SCENE_BG[state.scene];
+    state.fadeAlpha = 0;
+  }
   state.scene = id;
   state.running = cfg.running;
   (cfg.show || []).forEach(k => { state[k + 'Visible'] = true; });
@@ -443,6 +471,8 @@ function activateScene(id) {
   (cfg.resetProgress || []).forEach(k => { state[k] = 0; });
   (cfg.resetNull     || []).forEach(k => { state[k] = null; });
   if (cfg.resetPulseTick) state.pulseTick = 0;
+  state.dashOffset = 0;
+  state.labelAlpha = 0;
 
   swapPerson(cfg.person);
 
@@ -474,14 +504,34 @@ function getPathPoint(t, path) {
   };
 }
 
-function drawTrajectory(path) {
+function drawTrajectory(path, alpha = 1) {
   ctx.save();
   ctx.lineWidth = 4;
   ctx.setLineDash([10, 8]);
-  ctx.strokeStyle = 'rgba(255, 235, 170, 0.88)';
+  ctx.lineDashOffset = -state.dashOffset;
+  ctx.strokeStyle = `rgba(255, 235, 170, ${(0.88 * alpha).toFixed(2)})`;
   ctx.beginPath();
   ctx.moveTo(path.p0.x, path.p0.y);
   ctx.bezierCurveTo(path.p1.x, path.p1.y, path.p2.x, path.p2.y, path.p3.x, path.p3.y);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawTrajectoryProgress(path, t) {
+  if (t <= 0) return;
+  const N = 60;
+  const count = Math.ceil(t * N);
+  ctx.save();
+  ctx.lineWidth = 4;
+  ctx.setLineDash([10, 8]);
+  ctx.lineDashOffset = -state.dashOffset;
+  ctx.strokeStyle = 'rgba(255, 235, 170, 0.88)';
+  ctx.beginPath();
+  ctx.moveTo(path.p0.x, path.p0.y);
+  for (let i = 1; i <= count; i++) {
+    const pt = getPathPoint(Math.min(i / N, t), path);
+    ctx.lineTo(pt.x, pt.y);
+  }
   ctx.stroke();
   ctx.restore();
 }
@@ -499,8 +549,10 @@ function drawDashedSegment(from, to) {
 }
 
 function drawCenteredTitle(text) {
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.035);
   const size = Math.max(16, Math.min(30, state.w * 0.022));
   ctx.save();
+  ctx.globalAlpha = state.labelAlpha;
   ctx.font = `700 ${size}px Trebuchet MS`;
   ctx.lineWidth = 4;
   ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
@@ -657,7 +709,9 @@ function renderScene1() {
   const path = resolvePath(1);
 
   if (state.scene1Visible) {
-    drawTrajectory(path);
+    state.dashOffset += 0.3;
+    drawTrajectory(path, 0.22);
+    drawTrajectoryProgress(path, state.scene1Progress);
     drawLabel('Oslo', path.p0.x - 34, path.p0.y - 12);
     drawLabel('Myrdal mountain', path.p3.x - 120, path.p3.y - 12);
     drawMover(getPathPoint(state.scene1Progress, path), 20);
@@ -675,7 +729,9 @@ function renderScene1() {
 function renderScene2() {
   drawCoverImage(bgScene2);
   const path = resolvePath(2);
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.22);
+  drawTrajectoryProgress(path, state.scene2Progress);
 
   const trainPoint = getPathPoint(state.scene2Progress, path);
   drawTrainOnPoint(trainPoint);
@@ -693,7 +749,8 @@ function renderScene2() {
 function renderScene3() {
   drawCoverImage(bgScene3);
   const path = resolvePath(3);
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.45);
   drawLabel('Myrdal mountain', path.p0.x - 130, path.p0.y - 14);
   drawLabel('Flåm', path.p3.x - 85, path.p3.y - 14);
 
@@ -706,7 +763,9 @@ function renderScene3() {
 function renderScene4() {
   drawCoverImage(bgScene4);
   const path = resolvePath(4);
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.22);
+  drawTrajectoryProgress(path, state.scene4Progress);
   drawLabel('Myrdal mountain', path.p0.x - 130, path.p0.y - 14);
   drawLabel('Flåm', path.p3.x - 85, path.p3.y - 14);
 
@@ -725,7 +784,9 @@ function renderScene4() {
 function renderScene5() {
   drawCoverImage(bgScene5);
   const path = resolvePath(5);
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.22);
+  drawTrajectoryProgress(path, state.scene5Progress);
   drawLabel('Train Station', path.p0.x - 88, path.p0.y - 16);
   drawLabel('Accommodation', path.p3.x - 95, path.p3.y - 16);
 
@@ -812,7 +873,9 @@ function renderScene9() {
   const path = resolvePath(9);
 
   drawCenteredTitle('Thing to Do in Flam #1: Visit Brekkefossen Waterfall');
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.22);
+  drawTrajectoryProgress(path, state.scene9Progress);
   drawLabel(state.scene9Origin === 'hotel' ? 'Hotel' : 'Camp', path.p0.x - 46, path.p0.y + 40);
   drawLabel('Brekkefossen Waterfall', path.p3.x - 136, path.p3.y - 14);
 
@@ -831,7 +894,9 @@ function renderScene9() {
 function renderScene10() {
   drawCoverImage(bgScene10);
   const path = resolvePath(10);
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.22);
+  drawTrajectoryProgress(path, state.scene10Progress);
 
   drawCenteredTitle('Travel by Railway to the Flamsbana Museum');
   drawLabel('Brekkefossen Waterfall', path.p0.x + 30, path.p0.y - 18);
@@ -855,7 +920,9 @@ function renderScene11() {
   drawCenteredTitle('Thing to Do in Flam #2: Visit the Flamsbana Museum');
 
   const path = resolvePath(11);
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.22);
+  drawTrajectoryProgress(path, state.scene11Progress);
   drawLabel('Brekkefossen Waterfall', path.p0.x - 136, path.p0.y + 40);
   drawLabel('Flamsbana Museum', path.p3.x - 95, path.p3.y - 18);
 
@@ -880,7 +947,9 @@ function renderScene12() {
   drawCenteredTitle('Thing to Do in Flam #3: Eat at Ægir Microbrewery');
 
   const path = resolvePath(12);
-  drawTrajectory(path);
+  state.dashOffset += 0.3;
+  drawTrajectory(path, 0.22);
+  drawTrajectoryProgress(path, state.scene12Progress);
   drawLabel('Flamsbana Museum', path.p0.x - 98, path.p0.y - 16);
   drawLabel('Ægir Microbrewery', path.p3.x - 102, path.p3.y - 16);
 
