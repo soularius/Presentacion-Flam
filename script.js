@@ -147,6 +147,7 @@ const state = {
   scene11Visible: false,
   scene11Progress: 0,
   scene12Visible: false,
+  scene12Progress: 0,
   scene0Visible: true,
   scene9Origin: null,
   scene9Progress: 0,
@@ -286,6 +287,13 @@ function getScene11Nodes() {
     museum:    { x: state.w * 0.70, y: state.h * 0.36 },
   };
 }
+
+function getScene12Nodes() {
+  return {
+    museum: { x: state.w * 0.26, y: state.h * 0.58 },
+    restaurant: { x: state.w * 0.74, y: state.h * 0.52 },
+  };
+}
   function activateScene9(origin) {
     state.scene = 9;
     state.running = false;
@@ -352,6 +360,7 @@ function activateScene12() {
   state.running = false;
   state.scene11Visible = false;
   state.scene12Visible = true;
+  state.scene12Progress = 0;
   state.pulseTick = 0;
 
   clearPersonSceneClasses();
@@ -1053,6 +1062,27 @@ function render() {
     ctx.strokeText(title12, tx12, ty12);
     ctx.fillText(title12, tx12, ty12);
     ctx.restore();
+
+    const nodes12 = getScene12Nodes();
+    drawDashedSegment(nodes12.museum, nodes12.restaurant);
+    drawLabel('Flamsbana Museum', nodes12.museum.x - 98, nodes12.museum.y - 16);
+    drawLabel('Ægir Microbrewery', nodes12.restaurant.x - 102, nodes12.restaurant.y - 16);
+
+    if (state.scene12Progress < 1) {
+      state.scene12Progress += 0.009;
+      if (state.scene12Progress > 1) state.scene12Progress = 1;
+    }
+
+    const mover12 = {
+      x: nodes12.museum.x + (nodes12.restaurant.x - nodes12.museum.x) * state.scene12Progress,
+      y: nodes12.museum.y + (nodes12.restaurant.y - nodes12.museum.y) * state.scene12Progress,
+    };
+
+    state.pulseTick += 0.08;
+    const moverR12 = state.scene12Progress >= 1
+      ? 15 + Math.sin(state.pulseTick) * 2.6
+      : 15;
+    drawMover(mover12, moverR12);
   } else {
     drawCoverImage(bgScene1);
   }
