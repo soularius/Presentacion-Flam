@@ -46,11 +46,13 @@ body {
   z-index: 2;
   filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45));
   transform: translateX(-20vw) translateY(10vh);
-  transition: opacity 0.35s ease, transform 0.45s ease, width 0.35s ease;
+  scale: 1;
+  transition: opacity 0.35s ease, transform 0.45s ease, width 0.35s ease, scale 0.4s ease;
 }
 
 #person.hidden {
   opacity: 0;
+  scale: 0.93;
 }
 
 #person.scene-4 {

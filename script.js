@@ -450,7 +450,12 @@ function swapPerson(cfg) {
 
   if (wasVisible && srcChanges) {
     person.classList.add('hidden');
-    setTimeout(apply, 300);
+    const onEnd = (e) => {
+      if (e.propertyName !== 'opacity') return;
+      person.removeEventListener('transitionend', onEnd);
+      apply();
+    };
+    person.addEventListener('transitionend', onEnd);
   } else {
     apply();
   }
@@ -540,6 +545,7 @@ function drawDashedSegment(from, to) {
   ctx.save();
   ctx.lineWidth = 4;
   ctx.setLineDash([10, 8]);
+  ctx.lineDashOffset = -state.dashOffset;
   ctx.strokeStyle = 'rgba(255, 235, 170, 0.88)';
   ctx.beginPath();
   ctx.moveTo(from.x, from.y);
@@ -549,7 +555,6 @@ function drawDashedSegment(from, to) {
 }
 
 function drawCenteredTitle(text) {
-  state.labelAlpha = Math.min(1, state.labelAlpha + 0.035);
   const size = Math.max(16, Math.min(30, state.w * 0.022));
   ctx.save();
   ctx.globalAlpha = state.labelAlpha;
@@ -565,6 +570,7 @@ function drawCenteredTitle(text) {
 
 function drawLabel(text, x, y) {
   ctx.save();
+  ctx.globalAlpha = state.labelAlpha;
   ctx.font = '700 26px Trebuchet MS';
   ctx.lineWidth = 4;
   ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
@@ -706,6 +712,7 @@ function renderScene0() {
 
 function renderScene1() {
   drawCoverImage(bgScene1);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   const path = resolvePath(1);
 
   if (state.scene1Visible) {
@@ -748,6 +755,7 @@ function renderScene2() {
 
 function renderScene3() {
   drawCoverImage(bgScene3);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   const path = resolvePath(3);
   state.dashOffset += 0.3;
   drawTrajectory(path, 0.45);
@@ -762,6 +770,7 @@ function renderScene3() {
 
 function renderScene4() {
   drawCoverImage(bgScene4);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   const path = resolvePath(4);
   state.dashOffset += 0.3;
   drawTrajectory(path, 0.22);
@@ -783,6 +792,7 @@ function renderScene4() {
 
 function renderScene5() {
   drawCoverImage(bgScene5);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   const path = resolvePath(5);
   state.dashOffset += 0.3;
   drawTrajectory(path, 0.22);
@@ -810,8 +820,10 @@ function renderScene5() {
 
 function renderScene6() {
   drawCoverImage(bgScene6);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   const nodes = resolvePath(6);
 
+  state.dashOffset += 0.3;
   drawDashedSegment(nodes.center, nodes.left);
   drawDashedSegment(nodes.center, nodes.right);
   drawLabel('Accommodation', nodes.center.x - 105, nodes.center.y - 22);
@@ -850,26 +862,31 @@ function renderScene6() {
 
 function renderScene71() {
   drawCoverImage(bgScene71);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   drawLabel('Reception - Camp', state.w * 0.36, state.h * 0.12);
 }
 
 function renderScene72() {
   drawCoverImage(bgScene72);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   drawLabel('Reception - Hotel', state.w * 0.36, state.h * 0.12);
 }
 
 function renderScene81() {
   drawCoverImage(bgScene81, true);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   drawLabel('Camp - Check In', state.w * 0.36, state.h * 0.12);
 }
 
 function renderScene82() {
   drawCoverImage(bgScene82);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   drawLabel('Hotel - Check In', state.w * 0.36, state.h * 0.12);
 }
 
 function renderScene9() {
   drawCoverImage(bgScene9);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   const path = resolvePath(9);
 
   drawCenteredTitle('Thing to Do in Flam #1: Visit Brekkefossen Waterfall');
@@ -893,6 +910,7 @@ function renderScene9() {
 
 function renderScene10() {
   drawCoverImage(bgScene10);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   const path = resolvePath(10);
   state.dashOffset += 0.3;
   drawTrajectory(path, 0.22);
@@ -917,6 +935,7 @@ function renderScene10() {
 
 function renderScene11() {
   drawCoverImage(bgScene11);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   drawCenteredTitle('Thing to Do in Flam #2: Visit the Flamsbana Museum');
 
   const path = resolvePath(11);
@@ -944,6 +963,7 @@ function renderScene11() {
 
 function renderScene12() {
   drawCoverImage(bgScene12);
+  state.labelAlpha = Math.min(1, state.labelAlpha + 0.04);
   drawCenteredTitle('Thing to Do in Flam #3: Eat at Ægir Microbrewery');
 
   const path = resolvePath(12);
