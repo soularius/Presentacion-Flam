@@ -7,6 +7,8 @@ const priceBoard = document.getElementById('priceBoard');
 const priceBoardHotel = document.getElementById('priceBoardHotel');
 const payBtn = document.getElementById('payBtn');
 const coinContainer = document.getElementById('coinContainer');
+const getOutBtn = document.getElementById('getOutBtn');
+const nextSpotBtn = document.getElementById('nextSpotBtn');
 
 function spawnCoins() {
   const count = 28;
@@ -31,6 +33,20 @@ function onPayClick() {
   spawnCoins();
   if (state.scene === 71) activateScene81();
   else if (state.scene === 72) activateScene82();
+}
+
+function onGetOutClick() {
+  if (state.scene === 81) {
+    activateScene9('camp');
+  } else if (state.scene === 82) {
+    activateScene9('hotel');
+  }
+}
+
+function onNextSpotClick() {
+  if (state.scene === 9) {
+    activateScene10();
+  }
 }
 
 const bgScene1 = new Image();
@@ -62,6 +78,12 @@ bgScene81.src = 'assets/img/escene_8_1/background.png';
 
 const bgScene82 = new Image();
 bgScene82.src = 'assets/img/escene_8_2/background.png';
+
+const bgScene9 = new Image();
+bgScene9.src = 'assets/img/escene_9/background.png';
+
+const bgScene10 = new Image();
+bgScene10.src = 'assets/img/escene_10/background.png';
 
 const personScene4 = 'assets/img/escene_4/person.png';
 const personScene5 = 'assets/img/escene_5/person.png';
@@ -97,6 +119,10 @@ const state = {
   scene72Visible: false,
   scene81Visible: false,
   scene82Visible: false,
+  scene9Visible: false,
+  scene10Visible: false,
+  scene9Origin: null,
+  scene9Progress: 0,
   trainScale: 1,
   hoverX: -9999,
   hoverY: -9999,
@@ -209,6 +235,56 @@ function getScene6Nodes() {
   };
 }
 
+function getScene9Nodes(origin) {
+  return {
+    start: origin === 'hotel'
+      ? { x: state.w * 0.74, y: state.h * 0.76 }
+      : { x: state.w * 0.26, y: state.h * 0.76 },
+    end: { x: state.w * 0.52, y: state.h * 0.34 },
+  };
+}
+  function activateScene9(origin) {
+    state.scene = 9;
+    state.running = false;
+    state.scene71Visible = false;
+    state.scene72Visible = false;
+    state.scene81Visible = false;
+    state.scene82Visible = false;
+    state.scene9Visible = true;
+    state.scene10Visible = false;
+    state.scene9Origin = origin;
+    state.scene9Progress = 0;
+
+    clearPersonSceneClasses();
+    person.classList.add('hidden');
+    priceBoard.classList.add('hidden');
+    priceBoardHotel.classList.add('hidden');
+    payBtn.classList.add('hidden');
+    getOutBtn.classList.add('hidden');
+    nextSpotBtn.classList.remove('hidden');
+    backBtn.classList.add('hidden');
+  }
+
+function activateScene10() {
+  state.scene = 10;
+  state.running = false;
+  state.scene71Visible = false;
+  state.scene72Visible = false;
+  state.scene81Visible = false;
+  state.scene82Visible = false;
+  state.scene9Visible = false;
+  state.scene10Visible = true;
+
+  clearPersonSceneClasses();
+  person.classList.add('hidden');
+  priceBoard.classList.add('hidden');
+  priceBoardHotel.classList.add('hidden');
+  payBtn.classList.add('hidden');
+  getOutBtn.classList.add('hidden');
+  nextSpotBtn.classList.add('hidden');
+  backBtn.classList.add('hidden');
+}
+
 function getPathPoint(t, path) {
   return {
     x: bezierPoint(t, path.p0.x, path.p1.x, path.p2.x, path.p3.x),
@@ -301,11 +377,14 @@ function activateScene2() {
   state.scene2Progress = 0;
   state.scene81Visible = false;
   state.scene82Visible = false;
+  state.scene9Visible = false;
 
   clearPersonSceneClasses();
   person.classList.add('hidden');
   startBtn.classList.add('hidden');
   backBtn.classList.add('hidden');
+  getOutBtn.classList.add('hidden');
+  nextSpotBtn.classList.add('hidden');
 }
 
 function activateScene3() {
@@ -353,6 +432,7 @@ function activateScene6() {
   state.scene72Visible = false;
   state.scene81Visible = false;
   state.scene82Visible = false;
+  state.scene9Visible = false;
   state.scene6Progress = 0;
   state.scene6Choice = null;
 
@@ -363,6 +443,8 @@ function activateScene6() {
   priceBoard.classList.add('hidden');
   priceBoardHotel.classList.add('hidden');
   payBtn.classList.add('hidden');
+  getOutBtn.classList.add('hidden');
+  nextSpotBtn.classList.add('hidden');
   backBtn.classList.add('hidden');
 }
 
@@ -374,6 +456,7 @@ function activateScene71() {
   state.scene72Visible = false;
   state.scene81Visible = false;
   state.scene82Visible = false;
+  state.scene9Visible = false;
 
   person.src = personScene71;
   clearPersonSceneClasses();
@@ -382,6 +465,8 @@ function activateScene71() {
   priceBoard.classList.remove('hidden');
   priceBoardHotel.classList.add('hidden');
   payBtn.classList.remove('hidden');
+  getOutBtn.classList.add('hidden');
+  nextSpotBtn.classList.add('hidden');
   backBtn.textContent = 'Back';
   backBtn.classList.remove('hidden');
 }
@@ -394,6 +479,7 @@ function activateScene72() {
   state.scene72Visible = true;
   state.scene81Visible = false;
   state.scene82Visible = false;
+  state.scene9Visible = false;
 
   person.src = personScene72;
   clearPersonSceneClasses();
@@ -402,6 +488,8 @@ function activateScene72() {
   priceBoard.classList.add('hidden');
   priceBoardHotel.classList.remove('hidden');
   payBtn.classList.remove('hidden');
+  getOutBtn.classList.add('hidden');
+  nextSpotBtn.classList.add('hidden');
   backBtn.textContent = 'Exit';
   backBtn.classList.remove('hidden');
 }
@@ -413,6 +501,7 @@ function activateScene81() {
   state.scene81Visible = true;
   state.scene82Visible = false;
   state.scene72Visible = false;
+  state.scene9Visible = false;
 
   person.src = personScene81;
   clearPersonSceneClasses();
@@ -420,6 +509,8 @@ function activateScene81() {
   priceBoard.classList.add('hidden');
   priceBoardHotel.classList.add('hidden');
   payBtn.classList.add('hidden');
+  getOutBtn.classList.remove('hidden');
+  nextSpotBtn.classList.add('hidden');
   backBtn.textContent = 'Back';
   backBtn.classList.remove('hidden');
 }
@@ -431,14 +522,16 @@ function activateScene82() {
   state.scene81Visible = false;
   state.scene82Visible = true;
   state.scene71Visible = false;
+  state.scene9Visible = false;
 
   person.src = personScene82;
   clearPersonSceneClasses();
   person.classList.add('hidden');
-  person.classList.add('scene-8-2');
   priceBoard.classList.add('hidden');
   priceBoardHotel.classList.add('hidden');
   payBtn.classList.add('hidden');
+  getOutBtn.classList.remove('hidden');
+  nextSpotBtn.classList.add('hidden');
   backBtn.textContent = 'Back';
   backBtn.classList.remove('hidden');
 }
@@ -450,6 +543,12 @@ function goBackToChoice() {
     activateScene71();
   } else if (state.scene === 82) {
     activateScene72();
+  } else if (state.scene === 9) {
+    if (state.scene9Origin === 'hotel') {
+      activateScene82();
+    } else {
+      activateScene81();
+    }
   }
 }
 
@@ -641,6 +740,48 @@ function render() {
   } else if (state.scene === 82) {
     drawCoverImage(bgScene82);
     drawLabel('Hotel - Check In', state.w * 0.36, state.h * 0.12);
+  } else if (state.scene === 9) {
+    drawCoverImage(bgScene9);
+    const origin = state.scene9Origin || 'camp';
+    const nodes = getScene9Nodes(origin);
+
+    const title = 'Thing to Do in Flam #1: Visit Brekkefossen Waterfall';
+    const titleSize = Math.max(16, Math.min(30, state.w * 0.022));
+    ctx.save();
+    ctx.font = `700 ${titleSize}px Trebuchet MS`;
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.fillStyle = '#fff4d6';
+    const textW = ctx.measureText(title).width;
+    const tx = (state.w - textW) * 0.5;
+    const ty = state.h * 0.11;
+    ctx.strokeText(title, tx, ty);
+    ctx.fillText(title, tx, ty);
+    ctx.restore();
+
+    drawDashedSegment(nodes.start, nodes.end);
+    drawLabel(origin === 'hotel' ? 'Hotel' : 'Camp', nodes.start.x - 46, nodes.start.y + 40);
+    drawLabel('Brekkefossen Waterfall', nodes.end.x - 136, nodes.end.y - 14);
+
+    if (state.scene9Progress < 1) {
+      state.scene9Progress += 0.01;
+      if (state.scene9Progress > 1) {
+        state.scene9Progress = 1;
+      }
+    }
+
+    const moverPoint = {
+      x: nodes.start.x + (nodes.end.x - nodes.start.x) * state.scene9Progress,
+      y: nodes.start.y + (nodes.end.y - nodes.start.y) * state.scene9Progress,
+    };
+
+    const moverRadius = state.scene9Progress >= 1
+      ? 15 + Math.sin(state.pulseTick) * 2.6
+      : 15;
+    state.pulseTick += 0.08;
+    drawMover(moverPoint, moverRadius);
+  } else if (state.scene === 10) {
+    drawCoverImage(bgScene10);
   } else {
     drawCoverImage(bgScene1);
   }
@@ -698,6 +839,8 @@ window.addEventListener('resize', resizeCanvas);
 startBtn.addEventListener('click', startAnimation);
 backBtn.addEventListener('click', goBackToChoice);
 payBtn.addEventListener('click', onPayClick);
+getOutBtn.addEventListener('click', onGetOutClick);
+nextSpotBtn.addEventListener('click', onNextSpotClick);
 canvas.addEventListener('mousemove', onCanvasMove);
 canvas.addEventListener('click', onCanvasClick);
 
