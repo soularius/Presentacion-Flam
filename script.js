@@ -1,7 +1,37 @@
 const canvas = document.getElementById('sceneCanvas');
 const ctx = canvas.getContext('2d');
 const startBtn = document.getElementById('startBtn');
+const backBtn = document.getElementById('backBtn');
 const person = document.getElementById('person');
+const priceBoard = document.getElementById('priceBoard');
+const priceBoardHotel = document.getElementById('priceBoardHotel');
+const payBtn = document.getElementById('payBtn');
+const coinContainer = document.getElementById('coinContainer');
+
+function spawnCoins() {
+  const count = 28;
+  for (let i = 0; i < count; i++) {
+    const coin = document.createElement('span');
+    coin.className = 'coin';
+    coin.textContent = '€';
+    const left = 5 + Math.random() * 90;
+    const duration = 1.2 + Math.random() * 1.4;
+    const delay = Math.random() * 0.9;
+    const hue = Math.floor(Math.random() * 30);
+    coin.style.left = left + '%';
+    coin.style.animationDuration = duration + 's';
+    coin.style.animationDelay = delay + 's';
+    coin.style.color = `hsl(${42 + hue}, 100%, ${55 + hue}%)`;
+    coinContainer.appendChild(coin);
+    coin.addEventListener('animationend', () => coin.remove());
+  }
+}
+
+function onPayClick() {
+  spawnCoins();
+  if (state.scene === 71) activateScene81();
+  else if (state.scene === 72) activateScene82();
+}
 
 const bgScene1 = new Image();
 bgScene1.src = 'assets/img/escene_1/background.png';
@@ -21,9 +51,25 @@ bgScene5.src = 'assets/img/escene_5/background.jpg';
 const bgScene6 = new Image();
 bgScene6.src = 'assets/img/escene_6/background.jpg';
 
+const bgScene71 = new Image();
+bgScene71.src = 'assets/img/escene_7_1/background.jpg';
+
+const bgScene72 = new Image();
+bgScene72.src = 'assets/img/escene_7_2/background.jpg';
+
+const bgScene81 = new Image();
+bgScene81.src = 'assets/img/escene_8_1/background.png';
+
+const bgScene82 = new Image();
+bgScene82.src = 'assets/img/escene_8_2/background.png';
+
 const personScene4 = 'assets/img/escene_4/person.png';
 const personScene5 = 'assets/img/escene_5/person.png';
 const personScene6 = 'assets/img/escene_6/persona.png';
+const personScene71 = 'assets/img/escene_7_1/person.png';
+const personScene72 = 'assets/img/escene_7_2/person.png';
+const personScene81 = personScene71;
+const personScene82 = personScene72;
 
 const train = new Image();
 train.src = 'assets/img/escene_2/tren.png';
@@ -47,6 +93,10 @@ const state = {
   scene4Visible: false,
   scene5Visible: false,
   scene6Visible: false,
+  scene71Visible: false,
+  scene72Visible: false,
+  scene81Visible: false,
+  scene82Visible: false,
   trainScale: 1,
   hoverX: -9999,
   hoverY: -9999,
@@ -66,8 +116,10 @@ function resizeCanvas() {
   state.trainScale = Math.max(0.4, Math.min(1.25, state.w / 1200));
 }
 
-function drawCoverImage(img) {
-  if (!img.complete) {
+function drawCoverImage(img, alignBottom = false) {
+  ctx.clearRect(0, 0, state.w, state.h);
+
+  if (!img.complete || img.naturalWidth === 0) {
     ctx.fillStyle = '#1a1a1a';
     ctx.fillRect(0, 0, state.w, state.h);
     return;
@@ -88,7 +140,7 @@ function drawCoverImage(img) {
   } else {
     drawW = state.w;
     drawH = drawW / imgRatio;
-    offsetY = (state.h - drawH) * 0.5;
+    offsetY = alignBottom ? (state.h - drawH) : (state.h - drawH) * 0.5;
   }
 
   ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
@@ -231,18 +283,29 @@ function drawTrainOnPoint(point) {
   ctx.drawImage(train, trainX, trainY, trainW, trainH);
 }
 
+function clearPersonSceneClasses() {
+  person.classList.remove('scene-4');
+  person.classList.remove('scene-5');
+  person.classList.remove('scene-6');
+  person.classList.remove('scene-7-1');
+  person.classList.remove('scene-7-2');
+  person.classList.remove('scene-8-1');
+  person.classList.remove('scene-8-2');
+}
+
 function activateScene2() {
   state.scene = 2;
   state.running = true;
   state.scene1Visible = false;
   state.scene2Visible = true;
   state.scene2Progress = 0;
+  state.scene81Visible = false;
+  state.scene82Visible = false;
 
-  person.classList.remove('scene-4');
-  person.classList.remove('scene-5');
-  person.classList.remove('scene-6');
+  clearPersonSceneClasses();
   person.classList.add('hidden');
   startBtn.classList.add('hidden');
+  backBtn.classList.add('hidden');
 }
 
 function activateScene3() {
@@ -261,8 +324,7 @@ function activateScene4() {
   state.scene4Progress = 0;
 
   person.src = personScene4;
-  person.classList.remove('scene-5');
-  person.classList.remove('scene-6');
+  clearPersonSceneClasses();
   person.classList.remove('hidden');
   person.classList.add('scene-4');
 }
@@ -277,8 +339,7 @@ function activateScene5() {
   state.scene5HoldTick = 0;
 
   person.src = personScene5;
-  person.classList.remove('scene-4');
-  person.classList.remove('scene-6');
+  clearPersonSceneClasses();
   person.classList.remove('hidden');
   person.classList.add('scene-5');
 }
@@ -288,14 +349,108 @@ function activateScene6() {
   state.running = false;
   state.scene5Visible = false;
   state.scene6Visible = true;
+  state.scene71Visible = false;
+  state.scene72Visible = false;
+  state.scene81Visible = false;
+  state.scene82Visible = false;
   state.scene6Progress = 0;
   state.scene6Choice = null;
 
   person.src = personScene6;
-  person.classList.remove('scene-4');
-  person.classList.remove('scene-5');
+  clearPersonSceneClasses();
   person.classList.remove('hidden');
   person.classList.add('scene-6');
+  priceBoard.classList.add('hidden');
+  priceBoardHotel.classList.add('hidden');
+  payBtn.classList.add('hidden');
+  backBtn.classList.add('hidden');
+}
+
+function activateScene71() {
+  state.scene = 71;
+  state.running = false;
+  state.scene6Visible = false;
+  state.scene71Visible = true;
+  state.scene72Visible = false;
+  state.scene81Visible = false;
+  state.scene82Visible = false;
+
+  person.src = personScene71;
+  clearPersonSceneClasses();
+  person.classList.remove('hidden');
+  person.classList.add('scene-7-1');
+  priceBoard.classList.remove('hidden');
+  priceBoardHotel.classList.add('hidden');
+  payBtn.classList.remove('hidden');
+  backBtn.textContent = 'Back';
+  backBtn.classList.remove('hidden');
+}
+
+function activateScene72() {
+  state.scene = 72;
+  state.running = false;
+  state.scene6Visible = false;
+  state.scene71Visible = false;
+  state.scene72Visible = true;
+  state.scene81Visible = false;
+  state.scene82Visible = false;
+
+  person.src = personScene72;
+  clearPersonSceneClasses();
+  person.classList.remove('hidden');
+  person.classList.add('scene-7-2');
+  priceBoard.classList.add('hidden');
+  priceBoardHotel.classList.remove('hidden');
+  payBtn.classList.remove('hidden');
+  backBtn.textContent = 'Exit';
+  backBtn.classList.remove('hidden');
+}
+
+function activateScene81() {
+  state.scene = 81;
+  state.running = false;
+  state.scene71Visible = false;
+  state.scene81Visible = true;
+  state.scene82Visible = false;
+  state.scene72Visible = false;
+
+  person.src = personScene81;
+  clearPersonSceneClasses();
+  person.classList.add('hidden');
+  priceBoard.classList.add('hidden');
+  priceBoardHotel.classList.add('hidden');
+  payBtn.classList.add('hidden');
+  backBtn.textContent = 'Back';
+  backBtn.classList.remove('hidden');
+}
+
+function activateScene82() {
+  state.scene = 82;
+  state.running = false;
+  state.scene72Visible = false;
+  state.scene81Visible = false;
+  state.scene82Visible = true;
+  state.scene71Visible = false;
+
+  person.src = personScene82;
+  clearPersonSceneClasses();
+  person.classList.add('hidden');
+  person.classList.add('scene-8-2');
+  priceBoard.classList.add('hidden');
+  priceBoardHotel.classList.add('hidden');
+  payBtn.classList.add('hidden');
+  backBtn.textContent = 'Back';
+  backBtn.classList.remove('hidden');
+}
+
+function goBackToChoice() {
+  if (state.scene === 71 || state.scene === 72) {
+    activateScene6();
+  } else if (state.scene === 81) {
+    activateScene71();
+  } else if (state.scene === 82) {
+    activateScene72();
+  }
 }
 
 function isPointHit(point, radius, mouseX, mouseY) {
@@ -426,7 +581,7 @@ function render() {
     drawMover(travelPoint, pointRadius);
 
     updateCursor();
-  } else {
+  } else if (state.scene === 6) {
     drawCoverImage(bgScene6);
     const nodes = getScene6Nodes();
 
@@ -434,7 +589,7 @@ function render() {
     drawDashedSegment(nodes.center, nodes.right);
 
     drawLabel('Accommodation', nodes.center.x - 105, nodes.center.y - 22);
-    drawLabel('Campground', nodes.left.x - 70, nodes.left.y + 42);
+    drawLabel('Camp', nodes.left.x - 42, nodes.left.y + 42);
     drawLabel('Hotel', nodes.right.x - 30, nodes.right.y + 42);
 
     state.pulseTick += 0.08;
@@ -446,7 +601,7 @@ function render() {
       const centerRadius = 17 + Math.sin(state.pulseTick) * 2.8;
       drawMover(nodes.center, centerRadius);
     } else {
-      const target = state.scene6Choice === 'campground' ? nodes.left : nodes.right;
+      const target = state.scene6Choice === 'camp' ? nodes.left : nodes.right;
       if (state.scene6Progress < 1) {
         state.scene6Progress += 0.02;
         if (state.scene6Progress > 1) {
@@ -463,9 +618,31 @@ function render() {
         ? 16 + Math.sin(state.pulseTick) * 2.6
         : 16;
       drawMover(travel, travelRadius);
+
+      if (state.scene6Progress >= 1) {
+        if (state.scene6Choice === 'camp') {
+          activateScene71();
+        } else {
+          activateScene72();
+        }
+      }
     }
 
     updateCursor();
+  } else if (state.scene === 71) {
+    drawCoverImage(bgScene71);
+    drawLabel('Reception - Camp', state.w * 0.36, state.h * 0.12);
+  } else if (state.scene === 72) {
+    drawCoverImage(bgScene72);
+    drawLabel('Reception - Hotel', state.w * 0.36, state.h * 0.12);
+  } else if (state.scene === 81) {
+    drawCoverImage(bgScene81, true);
+    drawLabel('Camp - Check In', state.w * 0.36, state.h * 0.12);
+  } else if (state.scene === 82) {
+    drawCoverImage(bgScene82);
+    drawLabel('Hotel - Check In', state.w * 0.36, state.h * 0.12);
+  } else {
+    drawCoverImage(bgScene1);
   }
 
   requestAnimationFrame(render);
@@ -505,7 +682,7 @@ function onCanvasClick(event) {
   if (state.scene === 6 && !state.scene6Choice) {
     const nodes = getScene6Nodes();
     if (isPointHit(nodes.left, 24, x, y)) {
-      state.scene6Choice = 'campground';
+      state.scene6Choice = 'camp';
       state.scene6Progress = 0;
       return;
     }
@@ -519,6 +696,8 @@ function onCanvasClick(event) {
 
 window.addEventListener('resize', resizeCanvas);
 startBtn.addEventListener('click', startAnimation);
+backBtn.addEventListener('click', goBackToChoice);
+payBtn.addEventListener('click', onPayClick);
 canvas.addEventListener('mousemove', onCanvasMove);
 canvas.addEventListener('click', onCanvasClick);
 

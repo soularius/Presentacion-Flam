@@ -18,7 +18,58 @@
     />
 
     <button id="startBtn" class="start-btn" type="button">Start</button>
+    <button id="backBtn" class="nav-btn hidden" type="button">Back</button>
+
+    <div id="priceBoard" class="price-board hidden">
+      <h2 class="price-board__title">Prices per Night</h2>
+      <ul class="price-board__list">
+        <li>
+          <span class="price-board__label">Tent</span>
+          <span class="price-board__sub">(per person)</span>
+          <span class="price-board__price">€15 – €25</span>
+        </li>
+        <li>
+          <span class="price-board__label">Cabin</span>
+          <span class="price-board__sub">(shared bathroom)</span>
+          <span class="price-board__price">€70 – €110</span>
+        </li>
+        <li>
+          <span class="price-board__label">Cabin</span>
+          <span class="price-board__sub">(private bathroom)</span>
+          <span class="price-board__price">€130 – €180</span>
+        </li>
+      </ul>
+    </div>
+
+    <div id="priceBoardHotel" class="price-board price-board--hotel hidden">
+      <h2 class="price-board__title">Prices per Night</h2>
+      <ul class="price-board__list">
+        <li>
+          <span class="price-board__label">Hostel</span>
+          <span class="price-board__sub">(shared dorm bed)</span>
+          <span class="price-board__price">€40 – €55</span>
+        </li>
+        <li>
+          <span class="price-board__label">Hostel</span>
+          <span class="price-board__sub">(private room)</span>
+          <span class="price-board__price">from €90</span>
+        </li>
+        <li>
+          <span class="price-board__label">Hotel</span>
+          <span class="price-board__sub">(low / mid season)</span>
+          <span class="price-board__price">€150 – €220</span>
+        </li>
+        <li>
+          <span class="price-board__label">Hotel</span>
+          <span class="price-board__sub">(high season — summer)</span>
+          <span class="price-board__price">€250 – €350+</span>
+        </li>
+      </ul>
+    </div>
   </main>
+
+  <div id="coinContainer"></div>
+  <button id="payBtn" class="pay-btn hidden" type="button">Check In</button>
 
   <script src="script.js"></script>
 </body>
