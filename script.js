@@ -15,7 +15,11 @@ bgScene3.src = 'assets/img/escene_3/background.jpg';
 const bgScene4 = new Image();
 bgScene4.src = 'assets/img/escene_4/background.jpg';
 
+const bgScene5 = new Image();
+bgScene5.src = 'assets/img/escene_5/background.jpg';
+
 const personScene4 = 'assets/img/escene_4/person.png';
+const personScene5 = 'assets/img/escene_5/person.png';
 
 const train = new Image();
 train.src = 'assets/img/escene_2/tren.png';
@@ -27,12 +31,14 @@ const state = {
   scene1Progress: 0,
   scene2Progress: 0,
   scene4Progress: 0,
+  scene5Progress: 0,
   pulseTick: 0,
   running: false,
   scene1Visible: true,
   scene2Visible: false,
   scene3Visible: false,
   scene4Visible: false,
+  scene5Visible: false,
   trainScale: 1,
   hoverX: -9999,
   hoverY: -9999,
@@ -126,6 +132,15 @@ function getScene4Path() {
   };
 }
 
+function getScene5Path() {
+  return {
+    p0: { x: state.w * 0.2, y: state.h * 0.74 },
+    p1: { x: state.w * 0.38, y: state.h * 0.64 },
+    p2: { x: state.w * 0.6, y: state.h * 0.7 },
+    p3: { x: state.w * 0.82, y: state.h * 0.54 },
+  };
+}
+
 function getPathPoint(t, path) {
   return {
     x: bezierPoint(t, path.p0.x, path.p1.x, path.p2.x, path.p3.x),
@@ -212,11 +227,26 @@ function activateScene4() {
   state.running = true;
   state.scene3Visible = false;
   state.scene4Visible = true;
+  state.scene5Visible = false;
   state.scene4Progress = 0;
 
   person.src = personScene4;
+  person.classList.remove('scene-5');
   person.classList.remove('hidden');
   person.classList.add('scene-4');
+}
+
+function activateScene5() {
+  state.scene = 5;
+  state.running = false;
+  state.scene4Visible = false;
+  state.scene5Visible = true;
+  state.scene5Progress = 0;
+
+  person.src = personScene5;
+  person.classList.remove('scene-4');
+  person.classList.remove('hidden');
+  person.classList.add('scene-5');
 }
 
 function isPointHit(point, radius, mouseX, mouseY) {
@@ -292,7 +322,7 @@ function render() {
     const clickPoint = getPathPoint(0, path);
     drawMover(clickPoint, pulseRadius);
     updateCursor();
-  } else {
+  } else if (state.scene === 4) {
     drawCoverImage(bgScene4);
     const path = getScene4Path();
     drawTrajectory(path);
@@ -306,9 +336,33 @@ function render() {
       state.scene4Progress += 0.0034;
       if (state.scene4Progress >= 1) {
         state.scene4Progress = 1;
-        state.running = false;
+        activateScene5();
       }
     }
+
+    updateCursor();
+  } else {
+    drawCoverImage(bgScene5);
+    const path = getScene5Path();
+    drawTrajectory(path);
+    drawLabel('Train Station', path.p0.x - 88, path.p0.y - 16);
+    drawLabel('Accommodation', path.p3.x - 95, path.p3.y - 16);
+
+    state.pulseTick += 0.08;
+    let pointRadius = 16;
+    let travelPoint = getPathPoint(state.scene5Progress, path);
+
+    if (state.scene5Progress < 1) {
+      state.scene5Progress += 0.0032;
+      if (state.scene5Progress >= 1) {
+        state.scene5Progress = 1;
+      }
+      travelPoint = getPathPoint(state.scene5Progress, path);
+    } else {
+      pointRadius = 16 + Math.sin(state.pulseTick) * 3;
+    }
+
+    drawMover(travelPoint, pointRadius);
 
     updateCursor();
   }
