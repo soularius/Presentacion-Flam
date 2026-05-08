@@ -774,6 +774,145 @@ body {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
+/* ── Credits Button ── */
+.credits-btn {
+  position: fixed;
+  bottom: 1.2%;
+  right: 1.5%;
+  z-index: 20;
+  background: rgba(10, 7, 2, 0.62);
+  border: 1px solid rgba(122, 79, 29, 0.55);
+  border-radius: 999px;
+  color: rgba(255, 235, 170, 0.72);
+  font-family: var(--ui-font);
+  font-size: clamp(0.52rem, 0.9vw, 0.64rem);
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 4px 10px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.credits-btn:hover {
+  background: rgba(26, 18, 8, 0.88);
+  border-color: rgba(196, 144, 40, 0.7);
+  color: #ffe5a0;
+}
+
+/* ── Credits Overlay ── */
+.credits-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.credits-overlay.hidden {
+  display: none;
+}
+
+.credits-panel {
+  position: relative;
+  cursor: default;
+  background: #1a1208;
+  border: 3px solid #7a4f1d;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 0 2rem 1.4rem;
+  max-width: min(460px, 88vw);
+  width: 100%;
+  box-shadow: 4px 6px 28px rgba(0, 0, 0, 0.7);
+  font-family: 'Georgia', serif;
+}
+
+.credits-panel::before {
+  content: '';
+  display: block;
+  height: 6px;
+  background: linear-gradient(90deg, #5c2a00, #c47a1e 50%, #5c2a00);
+  margin: 0 -2rem 1.4rem;
+}
+
+.credits-title {
+  text-align: center;
+  font-size: clamp(0.82rem, 1.8vw, 0.98rem);
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffe5a0;
+  margin: 0 0 1.2rem;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.credits-section {
+  border-bottom: 1px dashed #4a2e0e;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.credits-section:last-of-type {
+  border-bottom: none;
+  margin-bottom: 1.1rem;
+}
+
+.credits-section__heading {
+  font-size: clamp(0.6rem, 1.1vw, 0.72rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #b88830;
+  font-style: italic;
+  font-weight: normal;
+  margin: 0 0 0.28rem;
+}
+
+.credits-section__text {
+  font-size: clamp(0.7rem, 1.3vw, 0.82rem);
+  color: #f5e6c8;
+  margin: 0;
+  line-height: 1.55;
+}
+
+.credits-section__text a {
+  color: #d4b98a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.credits-section__text a:hover {
+  color: #ffe5a0;
+}
+
+.credits-author {
+  text-align: center;
+  font-size: clamp(0.58rem, 1.05vw, 0.68rem);
+  color: rgba(255, 235, 170, 0.4);
+  margin: 0;
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+
+.credits-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: rgba(255, 235, 170, 0.45);
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.credits-close:hover {
+  color: #ffe5a0;
+}
+
 /* ── Scene Menu Overlay ── */
 .scene-menu {
   position: fixed;

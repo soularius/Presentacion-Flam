@@ -16,10 +16,13 @@ const musicBtn = document.getElementById('musicBtn');
 const sceneMenu = document.getElementById('sceneMenu');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const menuBoard = document.getElementById('menuBoard');
-const playVideoBtn  = document.getElementById('playVideoBtn');
-const videoOverlay  = document.getElementById('videoOverlay');
-const sceneVideo    = document.getElementById('sceneVideo');
-const closeVideoBtn = document.getElementById('closeVideoBtn');
+const playVideoBtn   = document.getElementById('playVideoBtn');
+const videoOverlay   = document.getElementById('videoOverlay');
+const sceneVideo     = document.getElementById('sceneVideo');
+const closeVideoBtn  = document.getElementById('closeVideoBtn');
+const creditsBtn     = document.getElementById('creditsBtn');
+const creditsOverlay = document.getElementById('creditsOverlay');
+const closeCreditsBtn = document.getElementById('closeCreditsBtn');
 
 const bgMusic = new Audio('assets/sounds/music.mp3');
 bgMusic.loop = true;
@@ -1384,6 +1387,9 @@ playVideoBtn.addEventListener('click', () => {
 });
 closeVideoBtn.addEventListener('click', closeVideo);
 videoOverlay.addEventListener('click', (e) => { if (e.target === videoOverlay) closeVideo(); });
+creditsBtn.addEventListener('click', () => creditsOverlay.classList.remove('hidden'));
+closeCreditsBtn.addEventListener('click', () => creditsOverlay.classList.add('hidden'));
+creditsOverlay.addEventListener('click', (e) => { if (e.target === creditsOverlay) creditsOverlay.classList.add('hidden'); });
 
 bgScene1.addEventListener('load', () => {
   resizeCanvas();
