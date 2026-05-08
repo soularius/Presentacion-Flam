@@ -153,6 +153,21 @@ const personScene82 = personScene72;
 const train = new Image();
 train.src = 'assets/img/escene_2/tren.png';
 
+const imgScene1Fjords    = new Image();
+imgScene1Fjords.src      = 'assets/img/escene_1/fjords.png';
+const imgScene1Mountains = new Image();
+imgScene1Mountains.src   = 'assets/img/escene_1/montains.png';
+const imgScene1Trees     = new Image();
+imgScene1Trees.src       = 'assets/img/escene_1/trees.png';
+const imgScene1Trees2    = new Image();
+imgScene1Trees2.src      = 'assets/img/escene_1/trees_2.png';
+
+const PIE_SLICES = [
+  { label: 'Fjords',    img: imgScene1Fjords,    color: '#1d5f8a', hover: '#2e7ab0' },
+  { label: 'Mountains', img: imgScene1Mountains, color: '#4a3870', hover: '#6a509a' },
+  { label: 'Trees',     img: imgScene1Trees,  img2: imgScene1Trees2, color: '#1e5e2a', hover: '#2e8040' },
+];
+
 const ANIM = {
   SPEED_S1:      0.005,
   SPEED_TRAIN:   0.0032,
@@ -167,6 +182,7 @@ const ANIM = {
   PULSE_CENTER6: { base: 17, amp: 2.8 },
   PULSE_REST:    { base: 15, amp: 2.6 },
   PULSE_NODE11:  { base: 15, amp: 2.8 },
+  PIE_SPEED:     0.07,
 };
 
 const state = {
@@ -190,6 +206,13 @@ const state = {
   scene10Progress: 0,
   scene11Progress: 0,
   scene12Progress: 0,
+  scene1TapOpen:    false,
+  scene1TapRadius:  0,
+  scene1ActiveSlice: null,
+  scene1ImageAlpha: 0,
+  scene1TreesVariant: 0,
+  scene1CartelDotX: -9999,
+  scene1CartelDotY: -9999,
   pulseTick: 0,
   dashOffset: 0,
   prevBg: null,
@@ -335,7 +358,8 @@ const SCENE_CONFIG = {
   },
   1: {
     running: false, show: ['scene1'], hide: ['scene0'],
-    resetProgress: ['scene1Progress'],
+    resetProgress: ['scene1Progress', 'scene1TapRadius', 'scene1ImageAlpha', 'scene1TreesVariant'],
+    resetNull: ['scene1TapOpen', 'scene1ActiveSlice'],
     person: { src: personScene1, cls: 'scene-1' },
     buttons: { menuBoard: 'h', priceBoard: 'h', priceBoardHotel: 'h', payBtn: 'h', getOutBtn: 'h',
                nextSpotBtn: 'h', backBtn: 'h', returnHomeBtn: 'h', restartBtn: 'h' },
@@ -686,7 +710,227 @@ function getScene3ClickPoint() {
   return getPathPoint(0, resolvePath(3));
 }
 
+function getScene1SliceAtPoint(x, y) {
+  const cx = state.w * 0.17, cy = state.h * 0.68;
+  const maxR = Math.min(state.w, state.h) * 0.19;
+  const dx = x - cx, dy = y - cy;
+  if (dx * dx + dy * dy > maxR * maxR || dx * dx + dy * dy < 64) return -1;
+  let angle = (Math.atan2(dy, dx) + Math.PI * 2.5) % (Math.PI * 2);
+  return Math.floor(angle / (Math.PI * 2 / 3));
+}
+
+function drawScene1TapDot() {
+  const cx = state.w * 0.17, cy = state.h * 0.68;
+  state.pulseTick += ANIM.PULSE_TICK;
+  const r = ANIM.PULSE_CLICK.base + Math.sin(state.pulseTick) * ANIM.PULSE_CLICK.amp;
+
+  ctx.save();
+  ctx.strokeStyle = `rgba(255,235,170,${0.28 + 0.18 * Math.sin(state.pulseTick * 0.7)})`;
+  ctx.lineWidth = 2;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + 18, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+
+  drawMover({ x: cx, y: cy }, r);
+}
+
+function drawScene1Pie(hoverSlice) {
+  if (state.scene1TapRadius < 1) state.scene1TapRadius += ANIM.PIE_SPEED;
+  const cx   = state.w * 0.17, cy = state.h * 0.68;
+  const maxR = Math.min(state.w, state.h) * 0.19;
+  const r    = maxR * Math.min(1, state.scene1TapRadius);
+  const base = -Math.PI / 2;
+  const arc  = (Math.PI * 2) / 3;
+
+  PIE_SLICES.forEach((slice, i) => {
+    const a0     = base + i * arc;
+    const a1     = a0 + arc;
+    const hot    = hoverSlice === i;
+    const sliceR = hot ? r * 1.07 : r;
+
+    // Image fill clipped to slice shape
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, sliceR, a0, a1);
+    ctx.closePath();
+    ctx.clip();
+
+    if (slice.img.complete && slice.img.naturalWidth > 0) {
+      // Cover-fill the slice area with the image
+      const imgScale = Math.max(sliceR * 2.2 / slice.img.width, sliceR * 2.2 / slice.img.height);
+      const dW = slice.img.width  * imgScale;
+      const dH = slice.img.height * imgScale;
+      ctx.filter = 'blur(6px)';
+      ctx.drawImage(slice.img, cx - dW / 2, cy - dH / 2, dW, dH);
+      ctx.filter = 'none';
+      // Color tint overlay — lighter on hover
+      ctx.globalAlpha = hot ? 0.18 : 0.38;
+      ctx.fillStyle   = slice.color;
+      ctx.fillRect(cx - sliceR - 2, cy - sliceR - 2, sliceR * 2 + 4, sliceR * 2 + 4);
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.fillStyle = hot ? slice.hover : slice.color;
+      ctx.fillRect(cx - sliceR - 2, cy - sliceR - 2, sliceR * 2 + 4, sliceR * 2 + 4);
+    }
+    ctx.restore();
+
+    // Stroke border (drawn outside clip so it isn't masked)
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, sliceR, a0, a1);
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,235,170,0.55)';
+    ctx.lineWidth   = 2;
+    ctx.stroke();
+    ctx.restore();
+
+    if (r > 28) {
+      const mid       = a0 + arc / 2;
+      const lx        = cx + Math.cos(mid) * r * 0.62;
+      const ly        = cy + Math.sin(mid) * r * 0.62;
+      const textAlpha = Math.min(1, (r - 28) / 28);
+      ctx.save();
+      ctx.globalAlpha  = textAlpha;
+      ctx.font         = `700 ${Math.max(11, Math.min(15, state.w * 0.012))}px Trebuchet MS`;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.strokeStyle  = 'rgba(0,0,0,0.75)';
+      ctx.lineWidth    = 4;
+      ctx.strokeText(slice.label, lx, ly);
+      ctx.fillStyle    = '#fff';
+      ctx.fillText(slice.label, lx, ly);
+      ctx.restore();
+    }
+  });
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+  ctx.fillStyle   = '#111';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,235,170,0.7)';
+  ctx.lineWidth   = 1.5;
+  ctx.stroke();
+}
+
+function drawScene1Cartel(sliceIndex) {
+  const slice      = PIE_SLICES[sliceIndex];
+  const currentImg = (sliceIndex === 2 && state.scene1TreesVariant === 1 && slice.img2)
+    ? slice.img2 : slice.img;
+
+  state.scene1ImageAlpha = Math.min(1, state.scene1ImageAlpha + 0.05);
+  const alpha = state.scene1ImageAlpha;
+
+  ctx.save();
+  ctx.globalAlpha = alpha * 0.68;
+  ctx.fillStyle   = '#000';
+  ctx.fillRect(0, 0, state.w, state.h);
+  ctx.restore();
+
+  if (!currentImg.complete || currentImg.naturalWidth === 0) return;
+
+  const pad    = 22;
+  const maxW   = state.w * 0.64;
+  const maxH   = state.h * 0.56;
+  const ratio  = currentImg.width / currentImg.height;
+  let dW = maxW, dH = maxW / ratio;
+  if (dH > maxH) { dH = maxH; dW = dH * ratio; }
+  const imgX   = (state.w - dW) / 2;
+  const imgY   = state.h * 0.09;
+  const titleH = 50;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  ctx.fillStyle   = '#2e1606';
+  ctx.strokeStyle = '#c49028';
+  ctx.lineWidth   = 5;
+  ctx.beginPath();
+  ctx.roundRect(imgX - pad, imgY - pad, dW + pad * 2, dH + pad * 2 + titleH, 12);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.drawImage(currentImg, imgX, imgY, dW, dH);
+
+  const fs = Math.max(14, Math.min(22, state.w * 0.018));
+  ctx.font         = `700 ${fs}px Trebuchet MS`;
+  ctx.textAlign    = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeStyle  = 'rgba(0,0,0,0.55)';
+  ctx.lineWidth    = 3;
+  ctx.fillStyle    = '#ffe5a0';
+  const ty = imgY + dH + pad * 0.5 + titleH * 0.5;
+  ctx.strokeText(slice.label, state.w / 2, ty);
+  ctx.fillText(slice.label,   state.w / 2, ty);
+
+  ctx.font      = `400 ${Math.max(10, Math.min(13, state.w * 0.01))}px Trebuchet MS`;
+  ctx.fillStyle = 'rgba(255,235,170,0.5)';
+  ctx.lineWidth = 0;
+  ctx.fillText('click anywhere to close', state.w / 2, state.h * 0.95);
+
+  ctx.restore();
+
+  // Navigation dot — only on the Trees slice (has two images)
+  if (sliceIndex === 2) {
+    const dotX = imgX + dW - 26;
+    const dotY = imgY + dH - 26;
+    state.scene1CartelDotX = dotX;
+    state.scene1CartelDotY = dotY;
+
+    state.pulseTick += ANIM.PULSE_TICK;
+    const pr = 11 + Math.sin(state.pulseTick * 1.1) * 2.5;
+
+    // Ripple ring
+    ctx.save();
+    ctx.globalAlpha = alpha * (0.28 + 0.2 * Math.sin(state.pulseTick * 0.7));
+    ctx.strokeStyle = 'rgba(160,255,160,0.85)';
+    ctx.lineWidth   = 1.5;
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, pr + 10, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
+    // Glow body
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    const glow = ctx.createRadialGradient(dotX, dotY, 2, dotX, dotY, pr);
+    glow.addColorStop(0,   'rgba(220,255,220,1)');
+    glow.addColorStop(0.5, 'rgba(120,240,120,0.85)');
+    glow.addColorStop(1,   'rgba(60,180,60,0)');
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, pr, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e8ffe8';
+    ctx.beginPath();
+    ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
 function updateCursor() {
+  if (state.scene === 1 && !state.running) {
+    if (state.scene1ActiveSlice !== null) {
+      canvas.style.cursor = 'pointer';
+      return;
+    }
+    if (state.scene1TapOpen) {
+      canvas.style.cursor = getScene1SliceAtPoint(state.hoverX, state.hoverY) >= 0
+        ? 'pointer' : 'default';
+      return;
+    }
+    const cx = state.w * 0.17, cy = state.h * 0.68;
+    const r  = ANIM.PULSE_CLICK.base + Math.sin(state.pulseTick) * ANIM.PULSE_CLICK.amp;
+    canvas.style.cursor = isPointHit({ x: cx, y: cy }, r + 18, state.hoverX, state.hoverY)
+      ? 'pointer' : 'default';
+    return;
+  }
+
   if (state.scene === 3) {
     const p = getScene3ClickPoint();
     const pulseRadius = ANIM.PULSE_CLICK.base + Math.sin(state.pulseTick) * ANIM.PULSE_CLICK.amp;
@@ -722,6 +966,18 @@ function renderScene1() {
     drawLabel('Oslo', path.p0.x - 34, path.p0.y - 12);
     drawLabel('Myrdal mountain', path.p3.x - 120, path.p3.y - 12);
     drawMover(getPathPoint(state.scene1Progress, path), 20);
+  }
+
+  if (!state.running) {
+    const hover = getScene1SliceAtPoint(state.hoverX, state.hoverY);
+    if (state.scene1ActiveSlice !== null) {
+      drawScene1Cartel(state.scene1ActiveSlice);
+    } else if (state.scene1TapOpen) {
+      drawScene1Pie(hover);
+    } else {
+      drawScene1TapDot();
+    }
+    updateCursor();
   }
 
   if (state.running) {
@@ -1026,6 +1282,43 @@ function onCanvasClick(event) {
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
+
+  if (state.scene === 1 && !state.running) {
+    if (state.scene1ActiveSlice !== null) {
+      // Trees navigation dot — toggle between image 1 and 2
+      if (state.scene1ActiveSlice === 2) {
+        const dx = x - state.scene1CartelDotX;
+        const dy = y - state.scene1CartelDotY;
+        if (dx * dx + dy * dy <= 22 * 22) {
+          state.scene1TreesVariant = state.scene1TreesVariant === 0 ? 1 : 0;
+          state.scene1ImageAlpha   = 0;
+          return;
+        }
+      }
+      // Any other click closes the cartel
+      state.scene1ActiveSlice = null;
+      state.scene1ImageAlpha  = 0;
+      return;
+    }
+    if (state.scene1TapOpen) {
+      const s = getScene1SliceAtPoint(x, y);
+      if (s >= 0) {
+        state.scene1ActiveSlice = s;
+        state.scene1ImageAlpha  = 0;
+      } else {
+        state.scene1TapOpen   = false;
+        state.scene1TapRadius = 0;
+      }
+      return;
+    }
+    const cx = state.w * 0.17, cy = state.h * 0.68;
+    const r  = ANIM.PULSE_CLICK.base + Math.sin(state.pulseTick) * ANIM.PULSE_CLICK.amp;
+    if (isPointHit({ x: cx, y: cy }, r + 18, x, y)) {
+      state.scene1TapOpen   = true;
+      state.scene1TapRadius = 0;
+    }
+    return;
+  }
 
   if (state.scene === 3) {
     const clickPoint = getScene3ClickPoint();
